@@ -13,12 +13,10 @@ from pyinfra.modules import yum
 @decorator_cls
 @dataclass
 class Package(PackageModel):
-    pkg_manager: str = 'yum'
-
     def _get_response(self) -> Dict:
         return {
             'package': self.name,
-            'state': 'present' if self.installed else 'absent',
+            'state': 'present' if self.present else 'absent',
             'stdout': None,
             'stderr': None,
             'exit_code': None,
@@ -28,13 +26,9 @@ class Package(PackageModel):
         """
         Add action to PyInfra object
         """
-        params = {
-            'latest': True,
-            'update': False,
-            'present': True,
-        }
-        if not self.installed:
-            params['present'] = False
+        params = {**self.__dict__}
+
+        del params['name']
 
         response = self._get_response()
 
@@ -53,11 +47,13 @@ class Package(PackageModel):
         Apply required action
         """
 
+        pkg_manager = 'yum'
+
         command_args = shlex.split('install -y')
-        if not self.installed:
+        if not self.present:
             command_args = shlex.split('erase -y')
 
-        command = ' '.join([self.pkg_manager] + command_args + [self.name])
+        command = ' '.join([pkg_manager] + command_args + [self.name])
 
         process = subprocess.Popen(command, executable='/bin/bash', shell=True,
                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)

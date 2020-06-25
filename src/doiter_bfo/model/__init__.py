@@ -21,6 +21,14 @@ class BaseBlock:
     name: str
 
 
+@dataclass
+class PackageModel(BaseBlock):
+    latest: bool = True
+    present: bool = True
+    update: bool = False
+    sudo: bool = False
+
+
 @unique
 class State(str, Enum):
     STOPPED = 'stopped'
@@ -33,18 +41,17 @@ class State(str, Enum):
 
 
 @dataclass
-class PackageModel(BaseBlock):
-    installed: bool
-
-
-@dataclass
 class ServiceModel(BaseBlock):
     state: State = State.UNKNOWN
+    enabled: bool = True
+    running: bool = True
+    sudo: bool = False
 
 
 @dataclass
 class CommandModel(BaseBlock):
     command: str
+    sudo: bool = False
 
 
 @dataclass
@@ -58,6 +65,7 @@ class TemplateModel(BaseBlock):
     user: str = None
     group: str = None
     template: bool = False
+    sudo: bool = False
 
     def __post_init__(self):
         if not any((self.src, self.content)):
@@ -93,6 +101,7 @@ class CrontabModel(BaseBlock):
     day_of_month: str = '*'
     command: str = '*'
     present: bool = True
+    sudo: bool = False
 #    interpolate_variables: bool = True
 
 
@@ -100,8 +109,9 @@ class CrontabModel(BaseBlock):
 class MysqlUserModel(BaseBlock):
     password: str = None
     privileges: str = None
+    sudo: bool = False
 
 
 @dataclass
 class MysqlDBModel(BaseBlock):
-    pass
+    sudo: bool = False

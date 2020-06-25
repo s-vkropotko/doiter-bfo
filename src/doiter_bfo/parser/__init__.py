@@ -1,7 +1,7 @@
 import importlib
 import logging
 
-from pyparsing import Word, alphanums, Group, OneOrMore, Suppress, ZeroOrMore
+from pyparsing import Word, alphanums, Group, OneOrMore, Suppress, ZeroOrMore, ParserElement
 from doiter_bfo.model import BaseBlock
 
 _logger = logging.getLogger('Parser')
@@ -20,14 +20,14 @@ class Parser:
     }
     {package
         :name vim
-        :installed
+        :present
     }
     """
     _param_value_chrs = ''.join(chr(c) for c in range(65536) if chr(c) not in [
-        '{', '}', ':', '"'] and not chr(c).isspace())
+        '{', '}', ':', '"', '\n'] and not chr(c).isspace())
 
     _param_value_string = ''.join(chr(c)
-                                  for c in range(65536) if chr(c) != '"')
+                                  for c in range(65536) if chr(c) not in ['"', '\n'])
 
     def _generate_kinds(self):
         """
@@ -50,21 +50,23 @@ class Parser:
 
     def __init__(self):
         self._generate_kinds()
+
+        ParserElement.setDefaultWhitespaceChars(' \t')
+
         self._parser = OneOrMore(
             Group(
                 Suppress('{') +
-                Word(alphanums) +
+                Word(alphanums) + Suppress('\n') +
                 OneOrMore(
                     Group(
                         Word(':' + alphanums + '_' + '-') +
                         ZeroOrMore(
                             Word(self._param_value_chrs) ^
                             Suppress(
-                                '"') + Word(self._param_value_string) + Suppress('"')
-                        )
+                                '"') + Word(self._param_value_string) + Suppress('"')) +
+                        Suppress('\n')
                     )
-                ) +
-                Suppress('}')
+                ) + Suppress('}') + ZeroOrMore(Suppress('\n'))
             )
         )
 

@@ -13,7 +13,7 @@ from pyinfra.modules import mysql
 class Mysqldb(MysqlDBModel):
     def _get_response(self) -> Dict:
         return {
-            'name': self.name,
+            'mysql_database': self.name,
         }
 
     def _apply_pyinfra(self, pyinfra: Pyinfra, *args, **kwargs) -> Dict:

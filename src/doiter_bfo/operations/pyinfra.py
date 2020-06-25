@@ -57,6 +57,7 @@ class Pyinfra:
 
     def add_action(self, action, desc: str, args: list = [], kwargs: dict = {},
                    response=None, apply=False) -> Dict:
+
         add_op(
             # self.state, yum.packages,
             self.state, action,

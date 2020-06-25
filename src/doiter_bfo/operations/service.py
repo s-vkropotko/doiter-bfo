@@ -12,8 +12,6 @@ from pyinfra.modules import init
 @decorator_cls
 @dataclass
 class Service(ServiceModel):
-    service_manager: str = 'systemctl'
-
     def _get_response(self) -> Dict:
         return {
             'service': self.name,
@@ -28,11 +26,9 @@ class Service(ServiceModel):
         """
         Add action to PyInfra object
         """
-        params = {
-            #            'reloaded': True,
-            'enabled': True,
-            'running': True
-        }
+        params = {**self.__dict__}
+
+        del params['name']
 
         response = self._get_response()
 
@@ -42,6 +38,8 @@ class Service(ServiceModel):
             params['restarted'] = True
         elif self.state is State.UNKNOWN:
             return response
+
+        del params['state']
 
         response = pyinfra.add_action(
             action=init.systemd,
@@ -57,6 +55,7 @@ class Service(ServiceModel):
         """
         Apply required action
         """
+        service_manager: str = 'systemctl'
 
         response = self._get_response()
 
@@ -72,7 +71,7 @@ class Service(ServiceModel):
             response['description'] = 'Unknown desired state'
             return response
 
-        command = ' '.join([self.service_manager] + command_args + [self.name])
+        command = ' '.join([service_manager] + command_args + [self.name])
 
         process = subprocess.Popen(command, executable='/bin/bash', shell=True,
                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)

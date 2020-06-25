@@ -85,9 +85,6 @@ def main(args):
     inventory = InventoryParser()
     hosts = inventory.parse_file(args.i)
 
-    parser = Parser()
-    blocks = parser.parse_file(args.f)
-
     prepared_hosts = []
     for host in hosts:
         prepared_host = next(make_names_data_ssh(host.get_connect_address()))
@@ -99,10 +96,14 @@ def main(args):
         make_names_data=prepared_hosts
     )
 
+    parser = Parser()
+    blocks = parser.parse_file(args.f)
+
     operations = {}
 
     for block in blocks:
         block_class_name = block.__class__.__name__
+
         if block_class_name.endswith('Model'):
             operation_class = block_class_name[:-5].lower()
 

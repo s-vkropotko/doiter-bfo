@@ -45,7 +45,8 @@ class Template(TemplateModel):
     def _apply_pyinfra(self, pyinfra: Pyinfra, *args, **kwargs) -> Dict:
         params = {
             'user': self.user,
-            'group': self.group
+            'group': self.group,
+            'sudo': self.sudo
         }
 
         response = self._get_response()

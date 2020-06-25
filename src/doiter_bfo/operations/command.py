@@ -26,7 +26,9 @@ class Command(CommandModel):
         """
         Add action to PyInfra object
         """
-        params = {}
+        params = {**self.__dict__}
+
+        del params['command']
 
         response = self._get_response()
 

@@ -1,32 +1,34 @@
-{command
-    :name "disable selinux"
-    :command "setenforce 0"
-}
 {package
     :name mariadb-server
-    :installed
+    :present
+    :sudo
 }
 {service
     :name mariadb
     :state started
+    :sudo
 }
 {mysqldb
     :name testdb
+    :sudo
 }
 {mysqluser
     :name testuser
     :password testpassword
     :privileges "ALL PRIVILEGES"
+    :sudo
 }
 {template
     :name "backup script"
     :dest /usr/local/bin/mysql-backup.sh
     :src scripts/mysql-backup.sh
     :exists
+    :sudo
 }
 {crontab
     :name "backup script"
     :minute 0
     :hour 2
     :command "bash /usr/local/bin/mysql-backup.sh"
+    :sudo
 }
