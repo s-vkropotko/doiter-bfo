@@ -1,0 +1,5 @@
+{host
+    :name testhost
+    :ip_address 192.168.1.117
+    :ssh_key ~/.ssh/id_rsa.tempkey
+}
